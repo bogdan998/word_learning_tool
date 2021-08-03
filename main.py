@@ -18,6 +18,11 @@ topics = {
     8: "umetnost",
 }
 
+def space_check(word):
+    word = word.split()
+    word = " ".join(word)
+
+    return word
 
 def generate_topics():
     for x in range(1, len(topics) + 1):
@@ -85,6 +90,8 @@ for a in array:
             answer = x[0]
 
         translatedWord = input("Prevedi rec {}: ".format(wordToTranslate))
+
+        translatedWord = space_check(translatedWord)
 
         if translatedWord.lower() == answer.lower():
             points += 1

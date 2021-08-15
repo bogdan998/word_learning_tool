@@ -1,26 +1,21 @@
 import mysql.connector
 import random
 
+
 db = mysql.connector.connect(
     host="localhost", user="root", passwd="root", database="pokusaj"
 )
 
-#My comment
 cursor = db.cursor()
 
-topics = {
-    1: "zivotinje",
-    2: "transport",
-    3: "boje",
-    4: "lokacije",
-    5: "ljudi",
-    6: "odeca",
-    7: "poslovi",
-    8: "umetnost",
-    9: "drustvo",
-    10: "pice",
-    11: "hrana"
-}
+cursor.execute('show tables')
+topics = {}
+counter = 1
+
+for x in cursor:
+	# print(f'{counter})',x[0])
+	topics.update({int('{}'.format(counter)): '{}'.format(x[0])})
+	counter += 1
 
 def space_check(word):
     word = word.split()

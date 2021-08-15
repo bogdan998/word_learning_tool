@@ -5,6 +5,7 @@ db = mysql.connector.connect(
     host="localhost", user="root", passwd="root", database="pokusaj"
 )
 
+#My comment
 cursor = db.cursor()
 
 topics = {

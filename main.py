@@ -16,6 +16,9 @@ topics = {
     6: "odeca",
     7: "poslovi",
     8: "umetnost",
+    9: "drustvo",
+    10: "pice",
+    11: "hrana"
 }
 
 def space_check(word):
@@ -26,7 +29,7 @@ def space_check(word):
 
 def generate_topics():
     for x in range(1, len(topics) + 1):
-        print("{}) {}".format(x, topics[x]))
+        print("{}) {}".format(x, topics[x].capitalize()))
 
 
 def user_choice():

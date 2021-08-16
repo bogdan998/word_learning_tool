@@ -6,10 +6,10 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 db = mysql.connector.connect(
-    host = '{}'.format(config['mysql']['host']),
-	user = '{}'.format(config['mysql']['user']),
-	passwd = '{}'.format(config['mysql']['passwd']),
-	db = '{}'.format(config['mysql']['db'])
+    host = config['mysql']['host'],
+	user = config['mysql']['user'],
+	passwd = config['mysql']['passwd'],
+	db = config['mysql']['db']
 )
 
 cursor = db.cursor()

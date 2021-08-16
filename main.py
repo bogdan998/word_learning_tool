@@ -1,9 +1,15 @@
 import mysql.connector
 import random
+import configparser
 
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 db = mysql.connector.connect(
-    host="localhost", user="root", passwd="root", database="pokusaj"
+    host = '{}'.format(config['mysql']['host']),
+	user = '{}'.format(config['mysql']['user']),
+	passwd = '{}'.format(config['mysql']['passwd']),
+	db = '{}'.format(config['mysql']['db'])
 )
 
 cursor = db.cursor()
@@ -98,4 +104,4 @@ for a in array:
             print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
 
 
-print("Broj vasih poena je {}/{}".format(points, numOfWords))
+print("Number of your points: {}/{}".format(points, numOfWords))

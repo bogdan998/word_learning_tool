@@ -60,48 +60,53 @@ def user_choice():
 
     return int(choice)
 
+while True:
+    table = user_choice()
 
-table = user_choice()
+    table = topics[table]
 
-table = topics[table]
+    countRowsQ = "SELECT COUNT(*) FROM {}".format(table)
 
-countRowsQ = "SELECT COUNT(*) FROM {}".format(table)
-
-cursor.execute(countRowsQ)
-
-for x in cursor:
-    numOfWords = x[0]
-
-points = 0
-array = list(range(1, numOfWords + 1))
-random.shuffle(array)
-
-for a in array:
-
-    questionNumber = a
-
-    wordSelectQ = "SELECT rec FROM {} WHERE id = {}".format(table, questionNumber)
-
-    cursor.execute(wordSelectQ)
+    cursor.execute(countRowsQ)
 
     for x in cursor:
-        wordToTranslate = x[0]
+        numOfWords = x[0]
 
-        answerQ = "SELECT prevod FROM {} WHERE id = {}".format(table, questionNumber)
+    points = 0
+    array = list(range(1, numOfWords + 1))
+    random.shuffle(array)
 
-        cursor.execute(answerQ)
+    for a in array:
+
+        questionNumber = a
+
+        wordSelectQ = "SELECT rec FROM {} WHERE id = {}".format(table, questionNumber)
+
+        cursor.execute(wordSelectQ)
 
         for x in cursor:
-            answer = x[0]
+            wordToTranslate = x[0]
 
-        translatedWord = input("Prevedi rec {}: ".format(wordToTranslate))
+            answerQ = "SELECT prevod FROM {} WHERE id = {}".format(table, questionNumber)
 
-        translatedWord = space_check(translatedWord)
+            cursor.execute(answerQ)
 
-        if translatedWord.lower() == answer.lower():
-            points += 1
-        else:
-            print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
+            for x in cursor:
+                answer = x[0]
+
+            translatedWord = input("Prevedi rec {}: ".format(wordToTranslate))
+
+            translatedWord = space_check(translatedWord)
+
+            if translatedWord.lower() == answer.lower():
+                points += 1
+            else:
+                print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
 
 
-print("Number of your points: {}/{}".format(points, numOfWords))
+    print("Number of your points: {}/{}".format(points, numOfWords))
+    print('Do you want to play again? (yes or no): ')
+    if not input('> ').lower().startswith('y'):
+        break
+
+print('Thanks for playing!')

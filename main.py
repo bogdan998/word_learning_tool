@@ -14,7 +14,7 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-cursor.execute('show tables')
+cursor.execute('SELECT name FROM topic')
 topics = {}
 counter = 1
 
@@ -63,9 +63,9 @@ def user_choice():
 while True:
     table = user_choice()
 
-    table = topics[table]
+    
 
-    countRowsQ = "SELECT COUNT(*) FROM {}".format(table)
+    countRowsQ = "SELECT COUNT(*) FROM topic_item WHERE topic_id = {}".format(table)
 
     cursor.execute(countRowsQ)
 
@@ -73,21 +73,27 @@ while True:
         numOfWords = x[0]
 
     points = 0
-    array = list(range(1, numOfWords + 1))
+    array = []
+
+    cursor.execute("SELECT id FROM topic_item WHERE topic_id = {}".format(table))
+
+    for x in cursor:
+        array.append(x[0])
+
     random.shuffle(array)
 
     for a in array:
 
         questionNumber = a
 
-        wordSelectQ = "SELECT rec FROM {} WHERE id = {}".format(table, questionNumber)
+        wordSelectQ = "SELECT word FROM topic_item WHERE id = {}".format(questionNumber)
 
         cursor.execute(wordSelectQ)
 
         for x in cursor:
             wordToTranslate = x[0]
 
-            answerQ = "SELECT prevod FROM {} WHERE id = {}".format(table, questionNumber)
+            answerQ = "SELECT translation FROM topic_item WHERE id = {}".format(questionNumber)
 
             cursor.execute(answerQ)
 

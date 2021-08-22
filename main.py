@@ -59,60 +59,62 @@ def user_choice():
                 )
 
     return int(choice)
+def start_training():
+    while True:
+        table = user_choice()
 
-while True:
-    table = user_choice()
+        
 
-    
+        countRowsQ = "SELECT COUNT(*) FROM topic_item WHERE topic_id = {}".format(table)
 
-    countRowsQ = "SELECT COUNT(*) FROM topic_item WHERE topic_id = {}".format(table)
-
-    cursor.execute(countRowsQ)
-
-    for x in cursor:
-        numOfWords = x[0]
-
-    points = 0
-    array = []
-
-    cursor.execute("SELECT id FROM topic_item WHERE topic_id = {}".format(table))
-
-    for x in cursor:
-        array.append(x[0])
-
-    random.shuffle(array)
-
-    for a in array:
-
-        questionNumber = a
-
-        wordSelectQ = "SELECT word FROM topic_item WHERE id = {}".format(questionNumber)
-
-        cursor.execute(wordSelectQ)
+        cursor.execute(countRowsQ)
 
         for x in cursor:
-            wordToTranslate = x[0]
+            numOfWords = x[0]
 
-            answerQ = "SELECT translation FROM topic_item WHERE id = {}".format(questionNumber)
+        points = 0
+        array = []
 
-            cursor.execute(answerQ)
+        cursor.execute("SELECT id FROM topic_item WHERE topic_id = {}".format(table))
+
+        for x in cursor:
+            array.append(x[0])
+
+        random.shuffle(array)
+
+        for a in array:
+
+            questionNumber = a
+
+            wordSelectQ = "SELECT word FROM topic_item WHERE id = {}".format(questionNumber)
+
+            cursor.execute(wordSelectQ)
 
             for x in cursor:
-                answer = x[0]
+                wordToTranslate = x[0]
 
-            translatedWord = input("Prevedi rec {}: ".format(wordToTranslate))
+                answerQ = "SELECT translation FROM topic_item WHERE id = {}".format(questionNumber)
 
-            translatedWord = space_check(translatedWord)
+                cursor.execute(answerQ)
 
-            if translatedWord.lower() == answer.lower():
-                points += 1
-            else:
-                print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
+                for x in cursor:
+                    answer = x[0]
+
+                translatedWord = input("Prevedi rec {}: ".format(wordToTranslate))
+
+                translatedWord = space_check(translatedWord)
+
+                if translatedWord.lower() == answer.lower():
+                    points += 1
+                else:
+                    print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
 
 
-    print("Number of your points: {}/{}".format(points, numOfWords))
-    print('Do you want to play again? (yes or no): ')
-    if not input('> ').lower().startswith('y'):
-        break
+        print("Number of your points: {}/{}".format(points, numOfWords))
+        print('Do you want to play again? (yes or no): ')
+        if not input('> ').lower().startswith('y'):
+            break
 
+
+start_training()
 print('Thanks for playing!')

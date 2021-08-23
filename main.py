@@ -1,6 +1,7 @@
 import mysql.connector
 import random
 import configparser
+from os import system, name
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -11,8 +12,108 @@ db = mysql.connector.connect(
 	passwd = config['mysql']['passwd'],
 	db = config['mysql']['db']
 )
-
 cursor = db.cursor()
+class User():
+
+    def __init__(self,firstName,lastName,username,email,password):
+        self.firstName = firstName
+        self.lastName = lastName
+        self.username = username
+        self.email = email
+        self.password = password
+
+    def add_user(self):
+        
+        q = "INSERT INTO user (first_name,last_name,username,email,password) VALUES (%s,%s,%s,%s,%s)"
+        values = (self.firstName.capitalize(),self.lastName.capitalize(),self.username,self.email,self.password)
+
+        cursor.execute(q,values)
+        db.commit()
+
+        print('User added.')
+        menu()
+
+    def __str__(self):
+        return f"{self.firstName} {self.lastName}"
+
+def welcome():
+    print("Welcome to word translation training.")
+    print('\n\n\n\n\n')
+    input('Press Enter to continue...')
+    clear()
+
+def clear():
+
+    if name == 'nt':
+        _ = system('cls')
+
+def create_account():
+    global first_name
+    first_name = input("Enter your first name: ")
+    global last_name 
+    last_name = input("Enter your last name: ")
+    global username
+    username = input("Enter your username: ")
+    global email
+    email = input("Enter your email: ")
+    global password
+    password = input("Enter your password: ")
+
+def set_user():
+    global user
+    user = User(first_name,last_name,username,email,password)
+
+def login():
+
+    username_from_user = input("Enter your username: ")
+    passwd_from_user = input("Enter your password: ")
+
+    q1 = "SELECT username FROM user WHERE password = '{}'".format(passwd_from_user)
+    q2 = "SELECT password FROM user WHERE username = '{}'".format(username_from_user) 
+    # q3 = "SELECT first_name FROM user WHERE username = {}".format(username_from_user)
+
+    username_from_db = 'wrong'
+    cursor.execute(q1)
+    for x in cursor:
+        username_from_db = x[0]
+
+    passwd_from_db = 'wrong'
+    cursor.execute(q2)
+    for x in cursor:
+        passwd_from_db = x[0]
+    
+    if passwd_from_db is None:
+        print("Invalid password or username. Please try again.")
+        login()
+
+    while True:
+        if username_from_db == username_from_user and passwd_from_db == passwd_from_user:
+            print(f"Welcome {username_from_db}")
+        if username_from_db != username_from_user or passwd_from_db != passwd_from_user:
+            print("Invalid password or username. Please try again.")
+            
+            login()
+        break
+    
+    start_training()
+
+def menu():
+
+    print('1. Login')
+    print('2. Sign in')
+    choice = input()
+    if choice.isnumeric():
+        if int(choice) == 1:
+            login()
+        elif int(choice) == 2:
+            create_account()
+            set_user()
+            user.add_user()
+        else:
+            print("That's not an option. Please enter a valid choice.")
+            menu()
+    if not choice.isnumeric():
+        print("That's not an option. Please enter a valid choice.")
 
 cursor.execute('SELECT name FROM topic')
 topics = {}
@@ -32,7 +133,6 @@ def space_check(word):
 def generate_topics():
     for x in range(1, len(topics) + 1):
         print("{}) {}".format(x, topics[x].capitalize()))
-
 
 def user_choice():
 
@@ -62,8 +162,6 @@ def user_choice():
 def start_training():
     while True:
         table = user_choice()
-
-        
 
         countRowsQ = "SELECT COUNT(*) FROM topic_item WHERE topic_id = {}".format(table)
 
@@ -116,5 +214,7 @@ def start_training():
             break
 
 
-start_training()
+clear()
+welcome()
+menu()
 print('Thanks for playing!')

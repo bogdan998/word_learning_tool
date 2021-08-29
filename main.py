@@ -30,7 +30,9 @@ class User():
         cursor.execute(q,values)
         db.commit()
 
-        print('User added.')
+        clear()
+        print('User added.\n')
+        print("Please log in.")
         menu()
 
     def __str__(self):
@@ -48,20 +50,20 @@ def clear():
         _ = system('cls')
 
 def create_account():
-    global first_name
+    
     first_name = input("Enter your first name: ")
-    global last_name 
+    
     last_name = input("Enter your last name: ")
-    global username
+    
     username = input("Enter your username: ")
-    global email
+    
     email = input("Enter your email: ")
-    global password
+
     password = input("Enter your password: ")
 
-def set_user():
     global user
     user = User(first_name,last_name,username,email,password)
+
 
 def login():
 
@@ -94,7 +96,7 @@ def login():
             
             login()
         break
-    
+    # if role_id == 1 adminMenu elif user == 2 studentMenu...
     start_training()
 
 def menu():
@@ -106,14 +108,14 @@ def menu():
         if int(choice) == 1:
             login()
         elif int(choice) == 2:
-            create_account()
-            set_user()
+            create_account()    
             user.add_user()
         else:
             print("That's not an option. Please enter a valid choice.")
             menu()
     if not choice.isnumeric():
         print("That's not an option. Please enter a valid choice.")
+        menu() 
 
 cursor.execute('SELECT name FROM topic')
 topics = {}
@@ -159,8 +161,10 @@ def user_choice():
                 )
 
     return int(choice)
+
 def start_training():
     while True:
+        
         table = user_choice()
 
         countRowsQ = "SELECT COUNT(*) FROM topic_item WHERE topic_id = {}".format(table)

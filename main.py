@@ -61,8 +61,13 @@ def create_account():
 
     password = input("Enter your password: ")
 
-    global user
-    user = User(first_name,last_name,username,email,password)
+    if len(first_name) == 0  or len(last_name) == 0 or len(username) == 0 or len(email) == 0 or len(password) == 0:
+        print("You must enter all data.")
+        print("Please try again.")
+        create_account()
+    else:
+        global user
+        user = User(first_name,last_name,username,email,password)
 
 
 def login():

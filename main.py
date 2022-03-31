@@ -1,10 +1,15 @@
 import mysql.connector
 import random
 import configparser
+import os
 from os import system, name
+from getpass import getpass
+import pathlib
+import sys
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+path = pathlib.Path(__file__).parent.resolve()
+config.read(os.path.join(path,'config.ini'))
 
 db = mysql.connector.connect(
     host = config['mysql']['host'],
@@ -12,6 +17,12 @@ db = mysql.connector.connect(
 	passwd = config['mysql']['passwd'],
 	db = config['mysql']['db']
 )
+# db = mysql.connector.connect(
+#     host = 'localhost',
+#     user = 'root',
+#     passwd = 'root',
+#     db = 'database'
+# )
 cursor = db.cursor()
 class User():
 
@@ -60,8 +71,8 @@ def create_account():
     email = input("Enter your email: ")
 
     password = input("Enter your password: ")
-
     if len(first_name) == 0  or len(last_name) == 0 or len(username) == 0 or len(email) == 0 or len(password) == 0:
+    
         print("You must enter all data.")
         print("Please try again.")
         create_account()
@@ -92,7 +103,7 @@ def login():
     if passwd_from_db is None:
         print("Invalid password or username. Please try again.")
         login()
-
+    
     while True:
         if username_from_db == username_from_user and passwd_from_db == passwd_from_user:
             print(f"Welcome {username_from_db}")
@@ -107,7 +118,7 @@ def login():
 def menu():
 
     print('1. Login')
-    print('2. Sign in')
+    print('2. Create account')
     choice = input()
     if choice.isnumeric():
         if int(choice) == 1:
@@ -140,11 +151,12 @@ def space_check(word):
 def generate_topics():
     for x in range(1, len(topics) + 1):
         print("{}) {}".format(x, topics[x].capitalize()))
+    print('\n\n0) for exit')
 
 def user_choice():
 
     choice = "wrong"
-    acceptable_range = range(1, len(topics) + 1)
+    acceptable_range = range(len(topics)) #(1, len(topics) + 1)
     within_range = False
 
     print("Choose a topic: ")
@@ -153,7 +165,8 @@ def user_choice():
         generate_topics()
 
         choice = input()
-
+        if choice == 0:
+            exit()
         if choice.isdigit() == False:
             print("That's not a number. Please try again.")
 
@@ -216,7 +229,7 @@ def start_training():
                 else:
                     print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
 
-
+        
         print("Number of your points: {}/{}".format(points, numOfWords))
         print('Do you want to play again? (yes or no): ')
         if not input('> ').lower().startswith('y'):

@@ -17,26 +17,23 @@ db = mysql.connector.connect(
 	passwd = config['mysql']['passwd'],
 	db = config['mysql']['db']
 )
-# db = mysql.connector.connect(
-#     host = 'localhost',
-#     user = 'root',
-#     passwd = 'root',
-#     db = 'database'
-# )
+
 cursor = db.cursor()
+
 class User():
 
-    def __init__(self,firstName,lastName,username,email,password):
+    def __init__(self,firstName,lastName,username,email,password,role=2):
         self.firstName = firstName
         self.lastName = lastName
         self.username = username
         self.email = email
         self.password = password
+        self.role = role
 
     def add_user(self):
         
-        q = "INSERT INTO user (first_name,last_name,username,email,password) VALUES (%s,%s,%s,%s,%s)"
-        values = (self.firstName.capitalize(),self.lastName.capitalize(),self.username,self.email,self.password)
+        q = "INSERT INTO user (first_name,last_name,username,email,password,role_id) VALUES (%s,%s,%s,%s,%s,%s)"
+        values = (self.firstName.capitalize(),self.lastName.capitalize(),self.username,self.email,self.password,self.role)
 
         cursor.execute(q,values)
         db.commit()
@@ -89,6 +86,7 @@ def login():
     q2 = "SELECT password FROM user WHERE username = '{}'".format(username_from_user) 
     # q3 = "SELECT first_name FROM user WHERE username = {}".format(username_from_user)
 
+
     username_from_db = 'wrong'
     cursor.execute(q1)
     for x in cursor:
@@ -111,8 +109,18 @@ def login():
             
             login()
         break
+    q3 = "SELECT role_id FROM user WHERE username = '{}' AND password = '{}' ".format(username_from_db,passwd_from_db)
+    role_id = 1
+    cursor.execute(q3)
+    for x in cursor:
+        role_id = x[0]
     # if role_id == 1 adminMenu elif user == 2 studentMenu...
-    student_menu()
+    if role_id == 1:
+        admin_menu()
+    elif role_id == 2:
+        student_menu()
+    elif role_id == 3:
+        instructor_menu()
 
 def menu():
 
@@ -131,6 +139,12 @@ def menu():
     if not choice.isnumeric():
         print("That's not an option. Please enter a valid choice.")
         menu() 
+
+def admin_menu():
+    print("You are in the admin_menu()")
+
+def instructor_menu():
+    print("You are in the instructor_menu()")
 
 
 def student_menu():
@@ -260,8 +274,8 @@ def start_training():
                     print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
 
         if table == 0:
-            student_menu()
-            
+            student_menu() # if role == student than student_menu()
+
         print("Number of your points: {}/{}".format(points, numOfWords))
         print('Do you want to play again? (yes or no): ')
         if not input('> ').lower().startswith('y'):

@@ -110,7 +110,7 @@ def login():
             login()
         break
     q3 = "SELECT role_id FROM user WHERE username = '{}' AND password = '{}' ".format(username_from_db,passwd_from_db)
-    role_id = 1
+    global role_id 
     cursor.execute(q3)
     for x in cursor:
         role_id = x[0]
@@ -274,7 +274,12 @@ def start_training():
                     print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
 
         if table == 0:
-            student_menu() # if role == student than student_menu()
+            if role_id == 1:
+                admin_menu()
+            elif role_id == 2:
+                student_menu()
+            elif role_id == 3:
+                instructor_menu()
 
         print("Number of your points: {}/{}".format(points, numOfWords))
         print('Do you want to play again? (yes or no): ')

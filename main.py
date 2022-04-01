@@ -51,12 +51,11 @@ class User():
 
 def welcome():
     print("Welcome to word translation training.")
-    print('\n\n\n\n\n')
+    print('\n\n\n')
     input('Press Enter to continue...')
     clear()
 
 def clear():
-
     if name == 'nt':
         _ = system('cls')
 
@@ -113,7 +112,7 @@ def login():
             login()
         break
     # if role_id == 1 adminMenu elif user == 2 studentMenu...
-    start_training()
+    student_menu()
 
 def menu():
 
@@ -133,6 +132,32 @@ def menu():
         print("That's not an option. Please enter a valid choice.")
         menu() 
 
+
+def student_menu():
+    clear()
+    print("1. Choose a topic")
+    print("2. Add a word")
+    print("3. See your score")
+    print("\n0) Exit the program :(")
+
+    choice = input()
+    if choice.isnumeric():
+        if int(choice) == 1:
+            start_training()
+        elif int(choice) == 2:
+            add_word()
+        elif int(choice) == 3:
+            check_score()
+        elif int(choice) == 0:
+            quit()
+        else:
+            print("That's not an option. Please enter a valid choice.")
+            student_menu()
+    if not choice.isnumeric():
+        print("That's not an option. Please enter a valid choice.")
+        student_menu()
+    
+
 cursor.execute('SELECT name FROM topic')
 topics = {}
 counter = 1
@@ -148,10 +173,15 @@ def space_check(word):
 
     return word
 
+def add_word():
+    pass
+def check_score():
+    pass
+
 def generate_topics():
     for x in range(1, len(topics) + 1):
         print("{}) {}".format(x, topics[x].capitalize()))
-    print('\n\n0) for exit')
+    print('\n\n0) for back')
 
 def user_choice():
 
@@ -166,7 +196,7 @@ def user_choice():
 
         choice = input()
         if choice == 0:
-            exit()
+            quit()  # student_menu() # if choice == 0 and role == student return student_menu() if role == admin return admin_menu()
         if choice.isdigit() == False:
             print("That's not a number. Please try again.")
 

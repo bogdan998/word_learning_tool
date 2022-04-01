@@ -259,7 +259,9 @@ def start_training():
                 else:
                     print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
 
-        
+        if table == 0:
+            student_menu()
+            
         print("Number of your points: {}/{}".format(points, numOfWords))
         print('Do you want to play again? (yes or no): ')
         if not input('> ').lower().startswith('y'):

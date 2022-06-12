@@ -1,3 +1,4 @@
+from asyncore import read
 import mysql.connector
 import random
 import configparser
@@ -22,9 +23,9 @@ cursor = db.cursor()
 
 class User():
 
-    def __init__(self,firstName,lastName,username,email,password,role=2):
-        self.firstName = firstName
-        self.lastName = lastName
+    def __init__(self,first_name,last_name,username,email,password,role=2):
+        self.first_name = first_name
+        self.last_name = last_name
         self.username = username
         self.email = email
         self.password = password
@@ -33,7 +34,7 @@ class User():
     def add_user(self):
         
         q = "INSERT INTO user (first_name,last_name,username,email,password,role_id) VALUES (%s,%s,%s,%s,%s,%s)"
-        values = (self.firstName.capitalize(),self.lastName.capitalize(),self.username,self.email,self.password,self.role)
+        values = (self.first_name.capitalize(),self.last_name.capitalize(),self.username,self.email,self.password,self.role)
 
         cursor.execute(q,values)
         db.commit()
@@ -44,7 +45,7 @@ class User():
         menu()
 
     def __str__(self):
-        return f"{self.firstName} {self.lastName}"
+        return f"{self.first_name} {self.last_name}"
 
 def welcome():
     print("Welcome to word translation training.")
@@ -141,14 +142,41 @@ def menu():
         menu() 
 
 def admin_menu():
-    print("You are in the admin_menu()")
+    print("1. Add user")
+    print("2. Remove user")
+    print("3. Reset users score")
+    print("4. Add topic")
+    print("5. Add word")    
+    print("\n0) Exit the program :(") # --> this can be a dictionary, use del dict['key'] to remove 
+                                      # unnecessary keys and dict['key'] = 'value' to add key-value
+
+    choice = input()
+    if choice.isnumeric():
+        if int(choice) == 1:
+            add_user()
+        elif int(choice) == 2:
+            remove_user()
+        elif int(choice) == 3:
+            reset_score()
+        elif int(choice) == 4:
+            add_topic()
+        elif int(choice) == 5:
+            add_word()
+        elif int(choice) == 0:
+            quit()
+        else:
+            print("That's not an option. Please enter a valid choice.")
+    if not choice.isnumeric():
+        print("That's not an option. Please enter a valid choice.")
+        admin_menu()
+        
+
 
 def instructor_menu():
     print("You are in the instructor_menu()")
 
 
 def student_menu():
-    clear()
     print("1. Choose a topic")
     print("2. Add a word")
     print("3. See your score")
@@ -171,15 +199,18 @@ def student_menu():
         print("That's not an option. Please enter a valid choice.")
         student_menu()
     
+def read_from_database(table_name: str):
+    counter = 1
+    dict = {}
+    cursor.execute(f'SELECT name FROM {table_name}')
+    for x in cursor:
+        # print(f'{counter})',x[0])
+        dict.update({int('{}'.format(counter)): '{}'.format(x[0])})
+        counter += 1
+    return dict
 
-cursor.execute('SELECT name FROM topic')
-topics = {}
-counter = 1
-
-for x in cursor:
-	# print(f'{counter})',x[0])
-	topics.update({int('{}'.format(counter)): '{}'.format(x[0])})
-	counter += 1
+topics = read_from_database('topic')
+languages = read_from_database('languages')
 
 def space_check(word):
     word = word.split()
@@ -188,25 +219,38 @@ def space_check(word):
     return word
 
 def add_word():
-    pass
+    print("inside the add_word()")
+
+
 def check_score():
-    pass
+    print("inside the check score")
 
-def generate_topics():
-    for x in range(1, len(topics) + 1):
-        print("{}) {}".format(x, topics[x].capitalize()))
+def add_user():
+    print("inside the add_user()")
+
+def remove_user():
+    print("inside the remove_user()")
+
+def reset_score():
+    print("inside the remove_score()")
+
+def add_topic():
+    print("inside the add_topic()")
+
+def generate_choice_list(var):
+    for x in range(1, len(var) + 1):
+        print("{}) {}".format(x, var[x].capitalize()))
     print('\n\n0) for back')
-
-def user_choice():
+    
+def user_choice(var):
 
     choice = "wrong"
-    acceptable_range = range(len(topics)) #(1, len(topics) + 1)
+    # acceptable_range = range(len(var)) #(1, len(topics) + 1)
+    acceptable_range = range(1,len(var) + 1)
     within_range = False
 
-    print("Choose a topic: ")
-
     while choice.isdigit() == False or within_range == False:
-        generate_topics()
+        generate_choice_list(var)
 
         choice = input()
         if choice == 0:
@@ -219,27 +263,36 @@ def user_choice():
                 within_range = True
             else:
                 print(
-                    f"There is not that number. Please insert a number between 1 and {len(topics)}."
+                    f"There is not that number. Please insert a number between 1 and {len(var)}."
                 )
 
     return int(choice)
 
+def chose_language():
+    print("Choose from which language you want to translate: ")
+    translate_from = user_choice(languages)
+    print("Choose from which language you want to translate: ")
+    translate_to = user_choice(languages)
+
+    return translate_from, translate_to
+
+
 def start_training():
+    
     while True:
-        
-        table = user_choice()
+        translate_from, translate_to = chose_language()
+        table = user_choice(topics)
+        count_rows_q = "SELECT COUNT(*) FROM words WHERE topic_id = {} and language_id = {}".format(table, translate_from)
 
-        countRowsQ = "SELECT COUNT(*) FROM topic_item WHERE topic_id = {}".format(table)
-
-        cursor.execute(countRowsQ)
+        cursor.execute(count_rows_q)
 
         for x in cursor:
-            numOfWords = x[0]
+            num_of_words = x[0]
 
         points = 0
         array = []
 
-        cursor.execute("SELECT id FROM topic_item WHERE topic_id = {}".format(table))
+        cursor.execute("SELECT word_id FROM words WHERE topic_id = {} and language_id = {}".format(table, translate_from))
 
         for x in cursor:
             array.append(x[0])
@@ -248,30 +301,30 @@ def start_training():
 
         for a in array:
 
-            questionNumber = a
+            question_number = a
 
-            wordSelectQ = "SELECT word FROM topic_item WHERE id = {}".format(questionNumber)
+            word_select_q = "SELECT word FROM words WHERE word_id = {} and topic_id = {} and language_id = {}".format(question_number,table,translate_from)
 
-            cursor.execute(wordSelectQ)
+            cursor.execute(word_select_q)
 
             for x in cursor:
-                wordToTranslate = x[0]
+                word_to_translate = x[0]
 
-                answerQ = "SELECT translation FROM topic_item WHERE id = {}".format(questionNumber)
+                answer_q = "select word from words where topic_id = {} and language_id = {} and word_id in(SELECT word_id from words where word = '{}')".format(table,translate_to,word_to_translate)
 
-                cursor.execute(answerQ)
+                cursor.execute(answer_q)
 
                 for x in cursor:
                     answer = x[0]
 
-                translatedWord = input("Prevedi rec {}: ".format(wordToTranslate))
+                translated_word = input("Prevedi rec {}: ".format(word_to_translate))
 
-                translatedWord = space_check(translatedWord)
+                translated_word = space_check(translated_word)
 
-                if translatedWord.lower() == answer.lower():
+                if translated_word.lower() == answer.lower():
                     points += 1
                 else:
-                    print("{} nije tacno prevod reci je {}".format(translatedWord, answer))
+                    print("{} nije tacno prevod reci je {}".format(translated_word, answer))
 
         if table == 0:
             if role_id == 1:
@@ -281,7 +334,7 @@ def start_training():
             elif role_id == 3:
                 instructor_menu()
 
-        print("Number of your points: {}/{}".format(points, numOfWords))
+        print("Number of your points: {}/{}".format(points, num_of_words))
         print('Do you want to play again? (yes or no): ')
         if not input('> ').lower().startswith('y'):
             break
